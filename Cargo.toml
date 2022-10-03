@@ -24,7 +24,7 @@ serde_derive = "1"
 har = "0.7"
 url = "2"
 rayon = "1"
-trust-dns-resolver = { version = "*", features = ["dns-over-rustls"] }
+trust-dns-resolver = { version = "0.22", features = ["dns-over-rustls"] }
 ping = "0.4"
 maxminddb = "0.23"
 dirs = "4"
