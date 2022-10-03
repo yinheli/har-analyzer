@@ -1597,12 +1597,16 @@ dependencies = [
  "ipnet",
  "lazy_static",
  "rand",
+ "rustls",
+ "rustls-pemfile",
  "smallvec",
  "thiserror",
  "tinyvec",
  "tokio",
+ "tokio-rustls",
  "tracing",
  "url",
+ "webpki",
 ]
 
 [[package]]
@@ -1618,11 +1622,14 @@ dependencies = [
  "lru-cache",
  "parking_lot",
  "resolv-conf",
+ "rustls",
  "smallvec",
  "thiserror",
  "tokio",
+ "tokio-rustls",
  "tracing",
  "trust-dns-proto",
+ "webpki-roots",
 ]
 
 [[package]]
