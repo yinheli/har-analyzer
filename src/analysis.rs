@@ -70,6 +70,7 @@ impl Record {
 
     fn latency(&self, addr: IpAddr) -> Result<Duration, Error> {
         let now = Instant::now();
+
         let r = ping(
             addr,
             Some(Duration::from_secs(2)),
@@ -81,7 +82,7 @@ impl Record {
 
         match r {
             Ok(_) => Ok(now.elapsed()),
-            Err(e) => Err(anyhow!("{:?}", e)),
+            Err(e) => Err(anyhow!("ping failed {:?}", e)),
         }
     }
 
