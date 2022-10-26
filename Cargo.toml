@@ -25,14 +25,14 @@ har = "0.7"
 url = "2"
 rayon = "1"
 trust-dns-resolver = { version = "0.22", features = ["dns-over-rustls"] }
-ping = "0.4"
+fastping-rs = "0.2"
 maxminddb = "0.23"
 dirs = "4"
 reqwest = { version = "0.11", features = [
   "rustls-tls",
   "blocking",
 ], default-features = false }
-tabled = "0.9"
+tabled = "0.10"
 
 [profile.release]
 opt-level = 3

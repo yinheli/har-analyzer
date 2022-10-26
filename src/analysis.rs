@@ -2,12 +2,13 @@ use std::{
     fs::{self, File},
     io::Write,
     net::{IpAddr, SocketAddr},
-    time::{Duration, Instant},
+    time::Duration,
 };
 
-use anyhow::{anyhow, Error};
+use anyhow::{bail, Error};
+use fastping_rs::Pinger;
 use log::info;
-use ping::ping;
+
 use rayon::prelude::{IntoParallelRefMutIterator, ParallelIterator};
 use tabled::Tabled;
 use trust_dns_resolver::{
@@ -25,6 +26,8 @@ pub struct Record {
     err: Option<String>,
 }
 
+type GeoIpReader<'a> = &'a maxminddb::Reader<Vec<u8>>;
+
 impl Record {
     pub fn to_tabled(&self) -> TabledRecord {
         TabledRecord::from(self)
@@ -40,7 +43,7 @@ impl Record {
         }
     }
 
-    fn analysis(&mut self, resolver: &Resolver, geo_ip_reader: &maxminddb::Reader<Vec<u8>>) {
+    fn analysis(&mut self, resolver: &Resolver, geo_ip_reader: GeoIpReader) {
         match self.lookup(resolver) {
             Ok(addrs) => self.addrs = addrs,
             Err(err) => {
@@ -69,28 +72,25 @@ impl Record {
     }
 
     fn latency(&self, addr: IpAddr) -> Result<Duration, Error> {
-        let now = Instant::now();
+        let (pinger, results) = match Pinger::new(None, Some(56)) {
+            Ok((pinger, results)) => (pinger, results),
+            Err(e) => panic!("Error creating pinger: {}", e),
+        };
 
-        let r = ping(
-            addr,
-            Some(Duration::from_secs(2)),
-            Some(64),
-            None,
-            None,
-            None,
-        );
+        pinger.add_ipaddr(&addr.to_string());
 
-        match r {
-            Ok(_) => Ok(now.elapsed()),
-            Err(e) => Err(anyhow!("ping failed {:?}", e)),
+        pinger.ping_once();
+
+        match results.recv() {
+            Ok(result) => match result {
+                fastping_rs::PingResult::Idle { addr: _ } => bail!("idle"),
+                fastping_rs::PingResult::Receive { addr: _, rtt } => return Ok(rtt),
+            },
+            Err(e) => bail!("{e}"),
         }
     }
 
-    fn geoip(
-        &self,
-        geo_ip_reader: &maxminddb::Reader<Vec<u8>>,
-        addrs: &Vec<IpAddr>,
-    ) -> Result<Vec<String>, Error> {
+    fn geoip(&self, geo_ip_reader: GeoIpReader, addrs: &Vec<IpAddr>) -> Result<Vec<String>, Error> {
         let mut buf = vec![];
 
         for addr in addrs {
