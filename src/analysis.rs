@@ -72,7 +72,7 @@ impl Record {
     }
 
     fn latency(&self, addr: IpAddr) -> Result<Duration, Error> {
-        let (pinger, results) = match Pinger::new(None, Some(56)) {
+        let (pinger, results) = match Pinger::new(Some(500), Some(56)) {
             Ok((pinger, results)) => (pinger, results),
             Err(e) => panic!("Error creating pinger: {}", e),
         };
@@ -83,7 +83,7 @@ impl Record {
 
         match results.recv() {
             Ok(result) => match result {
-                fastping_rs::PingResult::Idle { addr: _ } => bail!("idle"),
+                fastping_rs::PingResult::Idle { addr: _ } => bail!("timeout"),
                 fastping_rs::PingResult::Receive { addr: _, rtt } => return Ok(rtt),
             },
             Err(e) => bail!("{e}"),
