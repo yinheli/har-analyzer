@@ -153,7 +153,7 @@ fn build_resolve(dns_server: Option<String>) -> Result<Resolver, Error> {
 
 fn build_geoip_reader() -> Result<maxminddb::Reader<Vec<u8>>, Error> {
     let home = dirs::home_dir().unwrap();
-    let dir = home.join(".geolete2");
+    let dir = home.join(".geolite2");
     let file_path = dir.join("GeoLite2-City.mmdb");
 
     if !file_path.exists() {
