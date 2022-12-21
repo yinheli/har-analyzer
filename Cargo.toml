@@ -1,6 +1,6 @@
 [package]
 name = "har-analyzer"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 authors = ["yinheli <me@yinheli.com>"]
 description = """
@@ -28,10 +28,7 @@ trust-dns-resolver = { version = "0.22", features = ["dns-over-rustls"] }
 fastping-rs = "0.2"
 maxminddb = "0.23"
 dirs = "4"
-reqwest = { version = "0.11", features = [
-  "rustls-tls",
-  "blocking",
-], default-features = false }
+reqwest = { version = "0.11", features = ["rustls-tls", "blocking"], default-features = false }
 tabled = "0.10"
 
 [profile.release]
